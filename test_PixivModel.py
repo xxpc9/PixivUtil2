@@ -19,10 +19,6 @@ PixivConstant.PIXIVUTIL_LOG_FILE = 'pixivutil.test.log'
 last_page = 52
 
 
-def mock_getMemberInfoWhitecube(self, member_id, artist: PixivArtist, bookmark=False):
-    assert (artist is not None)
-    return artist
-
 # class MockPixivBrowser(PixivBrowser):
 #     mode = None
 
@@ -106,9 +102,8 @@ class TestPixivArtist(unittest.TestCase):
 
 class TestPixivImage(unittest.TestCase):
     def testPixivImageParseInfo(self):
-        p = open('./test/test-image-info-32039274.json', 'r', encoding="utf-8")
+        p = open('./test/test-image-info.html', 'r', encoding="utf-8")
         page = p.read()
-        PixivBrowser.getMemberInfoWhitecube = mock_getMemberInfoWhitecube
         image2 = PixivImage(32039274, page, dateFormat='%Y-%m-%d %H:%M')
 
         self.assertEqual(image2.imageId, 32039274)
@@ -178,9 +173,8 @@ class TestPixivImage(unittest.TestCase):
 #        self.assertEqual(image2.artist.artistToken, 'k2321656')
 
     def testPixivImageParseInfoMixed(self):
-        p = open('./test/test-image-info2-67729319.json', 'r', encoding="utf-8")
+        p = open('./test/test-image-info2.html', 'r', encoding="utf-8")
         page = p.read()
-        PixivBrowser.getMemberInfoWhitecube = mock_getMemberInfoWhitecube
         image2 = PixivImage(67729319, page)
 
         # image2.PrintInfo()
@@ -226,9 +220,8 @@ class TestPixivImage(unittest.TestCase):
 
     def testPixivImageNoAvatar(self):
         # print('\nTesting artist page without avatar image')
-        p = open('./test/test-image-noavatar-20496355.json', 'r', encoding="utf-8")
+        p = open('./test/test-image-noavatar.htm', 'r', encoding="utf-8")
         page = p.read()
-        PixivBrowser.getMemberInfoWhitecube = mock_getMemberInfoWhitecube
         image = PixivImage(20496355, page)
 
         # self.assertNotEqual(image, None)
@@ -241,9 +234,8 @@ class TestPixivImage(unittest.TestCase):
         # self.assertEqual(image.worksTools, 'RETAS STUDIO')
 
     def testPixivImageParseTags(self):
-        p = open('./test/test-image-parse-tags-11164869.json', 'r', encoding="utf-8")
+        p = open('./test/test-image-parse-tags.htm', 'r', encoding="utf-8")
         page = p.read()
-        PixivBrowser.getMemberInfoWhitecube = mock_getMemberInfoWhitecube
         image = PixivImage(11164869, page)
 
         self.assertNotEqual(image, None)
@@ -256,9 +248,8 @@ class TestPixivImage(unittest.TestCase):
         self.assertEqual(joinedResult.find("VOCALOID") > -1, True)
 
     def testPixivImageParseNoTags(self):
-        p = open('./test/test-image-no_tags-9175987.json', 'r', encoding="utf-8")
+        p = open('./test/test-image-no_tags.htm', 'r', encoding="utf-8")
         page = p.read()
-        PixivBrowser.getMemberInfoWhitecube = mock_getMemberInfoWhitecube
         image = PixivImage(9175987, page)
 
         self.assertNotEqual(image, None)
@@ -270,9 +261,8 @@ class TestPixivImage(unittest.TestCase):
 
     def testPixivImageUnicode(self):
         # print('\nTesting image page - big')
-        p = open('./test/test-image-unicode-2493913.json', 'r', encoding="utf-8")
+        p = open('./test/test-image-unicode.htm', 'r', encoding="utf-8")
         page = p.read()
-        PixivBrowser.getMemberInfoWhitecube = mock_getMemberInfoWhitecube
         image = PixivImage(2493913, page, dateFormat="%m/%d/%y %H:%M")
 
         self.assertNotEqual(image, None)
@@ -284,9 +274,8 @@ class TestPixivImage(unittest.TestCase):
         # self.assertEqual(image.worksTools, u'Photoshop SAI つけペン')
 
     def testPixivImageRateCount(self):
-        p = open('./test/test-image-rate_count-28865189.json', 'r', encoding="utf-8")
+        p = open('./test/test-image-rate_count.htm', 'r', encoding="utf-8")
         page = p.read()
-        PixivBrowser.getMemberInfoWhitecube = mock_getMemberInfoWhitecube
         image = PixivImage(28865189, page)
 
         self.assertNotEqual(image, None)
@@ -305,19 +294,24 @@ class TestPixivImage(unittest.TestCase):
     #     with self.assertRaises(PixivException):
     #         PixivImage(123, page)
 
-    def testPixivImageGenericError(self):
+    def testPixivImageDeleted(self):
         # print('\nTesting image page - deleted image')
-        p = open('./test/test-image-error-123.json', 'r', encoding="utf-8")
+        p = open('./test/test-image-deleted.htm', 'r', encoding="utf-8")
         page = p.read()
-        PixivBrowser.getMemberInfoWhitecube = mock_getMemberInfoWhitecube
+        with self.assertRaises(PixivException):
+            PixivImage(123, page)
+
+    def testPixivImageNoImageEng(self):
+        # print('\nTesting image page - no image')
+        p = open('./test/test-image-noimage-eng.htm', 'r', encoding="utf-8")
+        page = p.read()
         with self.assertRaises(PixivException):
             PixivImage(123, page)
 
     def testPixivImageModeManga(self):
         # print('\nTesting image page - manga')
-        p = open('./test/test-image-manga-28820443.json', 'r', encoding="utf-8")
+        p = open('./test/test-image-manga.htm', 'r', encoding="utf-8")
         page = p.read()
-        PixivBrowser.getMemberInfoWhitecube = mock_getMemberInfoWhitecube
         image = PixivImage(28820443, page)
 
         self.assertNotEqual(image, None)
@@ -330,9 +324,8 @@ class TestPixivImage(unittest.TestCase):
     def testPixivImageParseMangaInfoMixed(self):
         # print('\nTesting parse Manga Images')
         # Issue #224
-        p = open('./test/test-image-big-manga-mixed-67487303.json', 'r', encoding="utf-8")
+        p = open('./test/test-image-big-manga-mixed.html', 'r', encoding="utf-8")
         page = p.read()
-        PixivBrowser.getMemberInfoWhitecube = mock_getMemberInfoWhitecube
         image = PixivImage(iid=67487303, page=page, dateFormat="%m/%d/%y %H:%M")
         # image.PrintInfo()
 
@@ -405,20 +398,34 @@ class TestPixivImage(unittest.TestCase):
 
     def testPixivImageNoLogin(self):
         # print('\nTesting not logged in')
-        p = open('./test/test-image-nologin-67089412.json', 'r', encoding="utf-8")
+        p = open('./test/test-image-nologin.htm', 'r', encoding="utf-8")
         page = p.read()
-        PixivBrowser.getMemberInfoWhitecube = mock_getMemberInfoWhitecube
         try:
             PixivImage(67089412, page)
             self.assertRaises(PixivException)
         except PixivException as ex:
             self.assertEqual(ex.errorCode, PixivException.NOT_LOGGED_IN)
 
+    def testPixivImageServerError(self):
+        # print('\nTesting image page')
+        p = open('./test/test-server-error.html', 'r', encoding="utf-8")
+        page = p.read()
+        with self.assertRaises(PixivException) as ex:
+            PixivImage(9138317, page)
+        self.assertEqual(ex.exception.errorCode, PixivException.SERVER_ERROR)
+
+    def testPixivImageServerError2(self):
+        # print('\nTesting image page')
+        p = open('./test/test-image-generic-error.html', 'r', encoding="utf-8")
+        page = p.read()
+        with self.assertRaises(PixivException) as ex:
+            PixivImage(37882549, page)
+        self.assertEqual(ex.exception.errorCode, PixivException.UNKNOWN_IMAGE_ERROR)
+
     def testPixivImageUgoira(self):
         # print('\nTesting image page')
-        p = open('./test/test-image-ugoira-46281014.json', 'r', encoding="utf-8")
+        p = open('./test/test-image-ugoira.htm', 'r', encoding="utf-8")
         page = p.read()
-        PixivBrowser.getMemberInfoWhitecube = mock_getMemberInfoWhitecube
         image = PixivImage(46281014, page)
         # print(image.imageUrls)
         self.assertTrue(image.imageUrls[0].find(".zip") > -1)
@@ -426,9 +433,8 @@ class TestPixivImage(unittest.TestCase):
 
     def testPixivImageParseInfoSelf(self):
         # assuming being accessed via manage page for your own artwork.
-        p = open('./test/test-image-selfimage-65079382.json', 'r', encoding="utf-8")
+        p = open('./test/test-image-selfimage.htm', 'r', encoding="utf-8")
         page = p.read()
-        PixivBrowser.getMemberInfoWhitecube = mock_getMemberInfoWhitecube
         image2 = PixivImage(65079382, page, dateFormat="%m/%d/%y %H:%M")
 
         self.assertEqual(image2.imageId, 65079382)
